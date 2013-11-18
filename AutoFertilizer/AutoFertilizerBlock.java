@@ -1,31 +1,21 @@
-package net.minecraft.src;
+package AutoFertilizer;
 
 import java.util.Random;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
 public class AutoFertilizerBlock extends Block {
-	private int modelID;
+	public static int modelID;
 
-	protected AutoFertilizerBlock(int i, int j, int modelid) {
+	protected AutoFertilizerBlock(int i) {
 		super(i, Material.circuits);
-		blockIndexInTexture = j;
-		setTickOnLoad(true);
-		modelID = modelid;
-	}
-
-	@Override
-	public boolean blockActivated(World world, int i, int j, int k,
-			EntityPlayer entityplayer) {
-		if (mod_AutoFertilizer.GetFertBlockNeedsPower()) {
-			return false;
-		}
-		int metadata = world.getBlockMetadata(i, j, k);
-		world.setBlockMetadataWithNotify(
-				i,
-				j,
-				k,
-				mod_AutoFertilizer.BitSetOn(metadata,
-						!mod_AutoFertilizer.BitGetOn(metadata)));
-		return true;
+		setTickRandomly(true);
 	}
 
 	@Override
@@ -51,11 +41,8 @@ public class AutoFertilizerBlock extends Block {
 	}
 
 	@Override
-	public MovingObjectPosition collisionRayTrace(World world, int i, int j,
-			int k, Vec3D vec3d, Vec3D vec3d1) {
-		int l = mod_AutoFertilizer.BitGetDirection(world.getBlockMetadata(i, j,
-				k));
-
+	public MovingObjectPosition collisionRayTrace(World world, int i, int j, int k, Vec3 vec3d, Vec3 vec3d1) {
+		int l = mod_AutoFertilizer.BitGetDirection(world.getBlockMetadata(i, j, k));
 		switch (l) {
 		case 1:
 			setBlockBounds(0.0F, 0.2F, 0.25F, 0.5F, 1F, 0.75F);
@@ -74,13 +61,11 @@ public class AutoFertilizerBlock extends Block {
 			setBlockBounds(0.25f, 0.0F, 0.25f, 0.75F, 0.8F, 0.75F);
 			break;
 		}
-
 		return super.collisionRayTrace(world, i, j, k, vec3d, vec3d1);
 	}
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i,
-			int j, int k) {
+	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int i, int j, int k) {
 		return null;
 	}
 
@@ -95,9 +80,18 @@ public class AutoFertilizerBlock extends Block {
 	}
 
 	@Override
-	public void onBlockPlaced(World world, int i, int j, int k, int l) {
-		world.scheduleBlockUpdate(i, j, k, blockID, tickRate());
+	public boolean onBlockActivated(World world, int i, int j, int k, EntityPlayer entityplayer, int par6, float par7, float par8, float par9) {
+		if (mod_AutoFertilizer.GetFertBlockNeedsPower()) {
+			return false;
+		}
+		int metadata = world.getBlockMetadata(i, j, k);
+		world.setBlockMetadataWithNotify(i, j, k, mod_AutoFertilizer.BitSetOn(metadata, !mod_AutoFertilizer.BitGetOn(metadata)), 2);
+		return true;
+	}
 
+	@Override
+	public int onBlockPlaced(World world, int i, int j, int k, int l, float par6, float par7, float par8, int par9) {
+		world.scheduleBlockUpdate(i, j, k, blockID, tickRate(world));
 		int i1 = 0;
 		if ((l == 1) && world.isBlockOpaqueCube(i, j - 1, k)) {
 			i1 = 5;
@@ -114,13 +108,7 @@ public class AutoFertilizerBlock extends Block {
 		if ((l == 5) && world.isBlockOpaqueCube(i - 1, j, k)) {
 			i1 = 1;
 		}
-		world.setBlockMetadataWithNotify(
-				i,
-				j,
-				k,
-				mod_AutoFertilizer.BitSetDirection(
-						world.getBlockMetadata(i, j, k), i1));
-
+		world.setBlockMetadataWithNotify(i, j, k, mod_AutoFertilizer.BitSetDirection(world.getBlockMetadata(i, j, k), i1), 2);
 		switch (i1) {
 		case 1:
 			setBlockBounds(0.0F, 0.2F, 0.25F, 0.5F, 1F, 0.75F);
@@ -145,7 +133,7 @@ public class AutoFertilizerBlock extends Block {
 	public void onNeighborBlockChange(World world, int i, int j, int k, int l) {
 		if (!canBlockStay(world, i, j, k)) {
 			dropBlockAsItem(world, i, j, k, blockID);
-			world.setBlockWithNotify(i, j, k, 0);
+			world.setBlock(i, j, k, 0);
 		}
 	}
 
@@ -155,24 +143,17 @@ public class AutoFertilizerBlock extends Block {
 	}
 
 	@Override
-	public int tickRate() {
+	public int tickRate(World world) {
 		return 21 - mod_AutoFertilizer.GetFertBlockTicksPerSecond();
 	}
 
 	@Override
 	public void updateTick(World world, int i, int j, int k, Random random) {
-		if (mod_AutoFertilizer.GetFertBlockNeedsPower() ? world
-				.isBlockIndirectlyGettingPowered(i, j, k) : !mod_AutoFertilizer
-				.BitGetOn(world.getBlockMetadata(i, j, k))) {
-			mod_AutoFertilizer.Fert(world, i + 1, j + 1, k + 1,
-					mod_AutoFertilizer.GetFertBlockTicksPerSecond(), 2, 3);
-			world.spawnParticle("splash", (i + 0.5)
-					+ ((random.nextDouble() - 0.5D) * 0.4), (j + 0.7),
-					(k + 0.5) + ((random.nextDouble() - 0.5D) * 0.4),
-					(random.nextDouble() - 0.5D) * 20.0D, 20D,
+		if (mod_AutoFertilizer.GetFertBlockNeedsPower() ? world.isBlockIndirectlyGettingPowered(i, j, k) : !mod_AutoFertilizer.BitGetOn(world.getBlockMetadata(i, j, k))) {
+			mod_AutoFertilizer.Fert(world, i + 1, j + 1, k + 1, mod_AutoFertilizer.GetFertBlockTicksPerSecond(), 2, 3);
+			world.spawnParticle("splash", (i + 0.5) + ((random.nextDouble() - 0.5D) * 0.4), (j + 0.7), (k + 0.5) + ((random.nextDouble() - 0.5D) * 0.4), (random.nextDouble() - 0.5D) * 20.0D, 20D,
 					(random.nextDouble() - 0.5D) * 20.0D);
 		}
-		world.scheduleBlockUpdate(i, j, k, blockID, tickRate());
+		world.scheduleBlockUpdate(i, j, k, blockID, tickRate(world));
 	}
-
 }

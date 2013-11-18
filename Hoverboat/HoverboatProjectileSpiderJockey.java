@@ -1,11 +1,12 @@
-package net.minecraft.src;
+package Hoverboat;
 
-// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) braces deadcode 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntitySpider;
+import net.minecraft.world.World;
 
 public class HoverboatProjectileSpiderJockey extends HoverboatProjectileType {
-
 	@SuppressWarnings("rawtypes")
 	public HoverboatProjectileSpiderJockey(Class class1, int i, String s) {
 		ClassType = class1;
@@ -15,8 +16,7 @@ public class HoverboatProjectileSpiderJockey extends HoverboatProjectileType {
 	}
 
 	@Override
-	protected Entity CreateItem(World world, EntityLiving entityliving,
-			double d, double d1, double d2) {
+	protected Entity CreateItem(World world, EntityLiving entityliving, double d, double d1, double d2) {
 		EntitySpider entityspider = new EntitySpider(world);
 		entityspider.setPosition(d, d1, d2);
 		EntitySkeleton entityskeleton = new EntitySkeleton(world);
@@ -26,8 +26,7 @@ public class HoverboatProjectileSpiderJockey extends HoverboatProjectileType {
 	}
 
 	@Override
-	protected Entity ThrowItem(World world, EntityLiving entityliving,
-			double d, double d1, double d2) {
+	protected Entity ThrowItem(World world, EntityLiving entityliving, double d, double d1, double d2) {
 		return CreateItem(world, entityliving, d, d1, d2);
 	}
 }

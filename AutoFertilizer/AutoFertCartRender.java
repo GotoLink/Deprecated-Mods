@@ -1,9 +1,19 @@
-package net.minecraft.src;
+package AutoFertilizer;
+
+import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.model.ModelMinecart;
+import net.minecraft.client.renderer.RenderBlocks;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Vec3;
 
 import org.lwjgl.opengl.GL11;
 
 public class AutoFertCartRender extends Render {
 	protected ModelBase modelMinecart;
+	private ResourceLocation cart = new ResourceLocation("cart.png");
 
 	public AutoFertCartRender() {
 		shadowSize = 0.5F;
@@ -11,23 +21,18 @@ public class AutoFertCartRender extends Render {
 	}
 
 	@Override
-	public void doRender(Entity entitybase, double d, double d1, double d2,
-			float f, float f1) {
+	public void doRender(Entity entitybase, double d, double d1, double d2, float f, float f1) {
 		AutoFertCartEntity entity = (AutoFertCartEntity) entitybase;
 		GL11.glPushMatrix();
-		double d3 = entity.lastTickPosX
-				+ ((entity.posX - entity.lastTickPosX) * f1);
-		double d4 = entity.lastTickPosY
-				+ ((entity.posY - entity.lastTickPosY) * f1);
-		double d5 = entity.lastTickPosZ
-				+ ((entity.posZ - entity.lastTickPosZ) * f1);
+		double d3 = entity.lastTickPosX + ((entity.posX - entity.lastTickPosX) * f1);
+		double d4 = entity.lastTickPosY + ((entity.posY - entity.lastTickPosY) * f1);
+		double d5 = entity.lastTickPosZ + ((entity.posZ - entity.lastTickPosZ) * f1);
 		double d6 = 0.30000001192092896D;
-		Vec3D vec3d = entity.func_514_g(d3, d4, d5);
-		float f2 = entity.prevRotationPitch
-				+ ((entity.rotationPitch - entity.prevRotationPitch) * f1);
+		Vec3 vec3d = entity.func_70489_a(d3, d4, d5);
+		float f2 = entity.prevRotationPitch + ((entity.rotationPitch - entity.prevRotationPitch) * f1);
 		if (vec3d != null) {
-			Vec3D vec3d1 = entity.func_515_a(d3, d4, d5, d6);
-			Vec3D vec3d2 = entity.func_515_a(d3, d4, d5, -d6);
+			Vec3 vec3d1 = entity.func_70495_a(d3, d4, d5, d6);
+			Vec3 vec3d2 = entity.func_70495_a(d3, d4, d5, -d6);
 			if (vec3d1 == null) {
 				vec3d1 = vec3d;
 			}
@@ -37,8 +42,7 @@ public class AutoFertCartRender extends Render {
 			d += vec3d.xCoord - d3;
 			d1 += ((vec3d1.yCoord + vec3d2.yCoord) / 2D) - d4;
 			d2 += vec3d.zCoord - d5;
-			Vec3D vec3d3 = vec3d2.addVector(-vec3d1.xCoord, -vec3d1.yCoord,
-					-vec3d1.zCoord);
+			Vec3 vec3d3 = vec3d2.addVector(-vec3d1.xCoord, -vec3d1.yCoord, -vec3d1.zCoord);
 			if (vec3d3.lengthVector() != 0.0D) {
 				vec3d3 = vec3d3.normalize();
 				f = (float) ((Math.atan2(vec3d3.zCoord, vec3d3.xCoord) * 180D) / 3.1415926535897931D);
@@ -54,24 +58,24 @@ public class AutoFertCartRender extends Render {
 			f4 = 0.0F;
 		}
 		if (f3 > 0.0F) {
-			GL11.glRotatef(((MathHelper.sin(f3) * f3 * f4) / 10F)
-					* entity.minecartRockDirection, 1.0F, 0.0F, 0.0F);
+			GL11.glRotatef(((MathHelper.sin(f3) * f3 * f4) / 10F) * entity.minecartRockDirection, 1.0F, 0.0F, 0.0F);
 		}
-		loadTexture("/terrain.png");
 		float f5 = 1.2F;
 		GL11.glScalef(f5, f5, f5);
 		GL11.glTranslatef(0.0F, 0.3125F, 0.0F);
 		GL11.glRotatef(90F, 0.0F, 1.0F, 0.0F);
-		(new RenderBlocks()).renderBlockOnInventory(
-				mod_AutoFertilizer.afertblock, 0, 1);
+		(new RenderBlocks()).renderBlockOnInventory(mod_AutoFertilizer.afertblock, 0, 1);
 		GL11.glRotatef(-90F, 0.0F, 1.0F, 0.0F);
 		GL11.glTranslatef(0.0F, -0.3125F, 0.0F);
 		GL11.glScalef(1.0F / f5, 1.0F / f5, 1.0F / f5);
-
-		loadTexture("/item/cart.png");
+		bindEntityTexture(entity);
 		GL11.glScalef(-1F, -1F, 1.0F);
-		modelMinecart
-				.render(entitybase, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
+		modelMinecart.render(entitybase, 0.0F, 0.0F, -0.1F, 0.0F, 0.0F, 0.0625F);
 		GL11.glPopMatrix();
+	}
+
+	@Override
+	protected ResourceLocation getEntityTexture(Entity entity) {
+		return cart;
 	}
 }

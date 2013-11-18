@@ -1,16 +1,18 @@
-package net.minecraft.src;
+package Hoverboat;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class HoverboatProjectileDefault extends HoverboatProjectileType {
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.world.World;
 
+public class HoverboatProjectileDefault extends HoverboatProjectileType {
 	@SuppressWarnings("rawtypes")
 	public HoverboatProjectileDefault(Class class1, int i) {
 		ClassType = class1;
 		ItemID = i;
 		try {
-			ClassType.getConstructor(new Class[] { World.class,
-					EntityLiving.class });
+			ClassType.getConstructor(new Class[] { World.class, EntityLiving.class });
 			throwable = true;
 		} catch (Exception exception) {
 			throwable = false;
@@ -23,8 +25,7 @@ public class HoverboatProjectileDefault extends HoverboatProjectileType {
 		ClassType = class1;
 		ItemID = i;
 		try {
-			ClassType.getConstructor(new Class[] { World.class,
-					EntityLiving.class });
+			ClassType.getConstructor(new Class[] { World.class, EntityLiving.class });
 			throwable = true;
 		} catch (Exception exception) {
 			throwable = false;
@@ -33,24 +34,16 @@ public class HoverboatProjectileDefault extends HoverboatProjectileType {
 	}
 
 	@Override
-	protected Entity CreateItem(World world, EntityLiving entityliving,
-			double d, double d1, double d2) throws IllegalArgumentException,
-			SecurityException, InstantiationException, IllegalAccessException,
-			InvocationTargetException, NoSuchMethodException {
-		Entity entity = (Entity) ClassType.getConstructor(
-				new Class[] { World.class })
-				.newInstance(new Object[] { world });
+	protected Entity CreateItem(World world, EntityLiving entityliving, double d, double d1, double d2) throws IllegalArgumentException, SecurityException, InstantiationException,
+			IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		Entity entity = (Entity) ClassType.getConstructor(new Class[] { World.class }).newInstance(new Object[] { world });
 		return entity;
 	}
 
 	@Override
-	protected Entity ThrowItem(World world, EntityLiving entityliving,
-			double d, double d1, double d2) throws IllegalArgumentException,
-			SecurityException, InstantiationException, IllegalAccessException,
-			InvocationTargetException, NoSuchMethodException {
-		Entity entity = (Entity) ClassType.getConstructor(
-				new Class[] { World.class, EntityLiving.class }).newInstance(
-				new Object[] { world, entityliving });
+	protected Entity ThrowItem(World world, EntityLiving entityliving, double d, double d1, double d2) throws IllegalArgumentException, SecurityException, InstantiationException,
+			IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		Entity entity = (Entity) ClassType.getConstructor(new Class[] { World.class, EntityLiving.class }).newInstance(new Object[] { world, entityliving });
 		return entity;
 	}
 }
