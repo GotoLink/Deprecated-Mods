@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityFallingSand;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
@@ -51,14 +51,14 @@ public class HoverboatProjectileBlock extends HoverboatProjectileType {
 	}
 
 	@Override
-	protected Entity CreateItem(World world, EntityLiving entityliving, double d, double d1, double d2) {
+	protected Entity CreateItem(World world, EntityLivingBase entityliving, double d, double d1, double d2) {
 		EntityFallingSand entityfallingsand = new EntityFallingSand(world, d, d1, d2, ItemID);
 		entityfallingsand.preventEntitySpawning = false;
 		return entityfallingsand;
 	}
 
 	@Override
-	protected Entity ThrowItem(World world, EntityLiving entityliving, double d, double d1, double d2) {
+	protected Entity ThrowItem(World world, EntityLivingBase entityliving, double d, double d1, double d2) {
 		return CreateItem(world, entityliving, d, d1, d2);
 	}
 

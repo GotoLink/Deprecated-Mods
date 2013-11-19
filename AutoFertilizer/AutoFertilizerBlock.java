@@ -108,7 +108,6 @@ public class AutoFertilizerBlock extends Block {
 		if ((l == 5) && world.isBlockOpaqueCube(i - 1, j, k)) {
 			i1 = 1;
 		}
-		world.setBlockMetadataWithNotify(i, j, k, mod_AutoFertilizer.BitSetDirection(world.getBlockMetadata(i, j, k), i1), 2);
 		switch (i1) {
 		case 1:
 			setBlockBounds(0.0F, 0.2F, 0.25F, 0.5F, 1F, 0.75F);
@@ -127,12 +126,13 @@ public class AutoFertilizerBlock extends Block {
 			setBlockBounds(0.25f, 0.0F, 0.25f, 0.75F, 0.8F, 0.75F);
 			break;
 		}
+		return mod_AutoFertilizer.BitSetDirection(world.getBlockMetadata(i, j, k), i1);
 	}
 
 	@Override
 	public void onNeighborBlockChange(World world, int i, int j, int k, int l) {
 		if (!canBlockStay(world, i, j, k)) {
-			dropBlockAsItem(world, i, j, k, blockID);
+			dropBlockAsItem(world, i, j, k, blockID, 0);
 			world.setBlock(i, j, k, 0);
 		}
 	}

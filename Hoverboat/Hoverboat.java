@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFluid;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -202,12 +201,17 @@ public class Hoverboat extends Entity implements IInventory {
 
 	@Override
 	public int getSizeInventory() {
-		return mod_Hoverboat.Instance.settingMultiChestSize.get() * 27;
+		return mod_Hoverboat.Instance.settingMultiChestSize * 27;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int i) {
 		return inventory[i];
+	}
+
+	@Override
+	public ItemStack getStackInSlotOnClosing(int i) {
+		return null;
 	}
 
 	@Override
@@ -234,6 +238,16 @@ public class Hoverboat extends Entity implements IInventory {
 			boundingBox.maxY = boundingBox.minY + calculated;
 			entityplayer.rotationYaw = rotationYaw + 90F;
 		}
+		return true;
+	}
+
+	@Override
+	public boolean isInvNameLocalized() {
+		return false;
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		return true;
 	}
 
@@ -388,7 +402,7 @@ public class Hoverboat extends Entity implements IInventory {
 						extrajump = 0.6D;
 						jumpedLastFrameHigh = true;
 						SlowDecent = false;
-					} else if ((currentheight < (hoverheight + mod_Hoverboat.Instance.settingFloatMaxJump.get())) && jumpedLastFrameHigh) {
+					} else if ((currentheight < (hoverheight + mod_Hoverboat.Instance.settingFloatMaxJump)) && jumpedLastFrameHigh) {
 						extrajump = 0.6D;
 					} else {
 						jumpedLastFrameHigh = false;
@@ -790,7 +804,7 @@ public class Hoverboat extends Entity implements IInventory {
 	}
 
 	private void CompressChestIfNeeded() {
-		int i = mod_Hoverboat.Instance.settingMultiChestSize.get() * 27;
+		int i = mod_Hoverboat.Instance.settingMultiChestSize * 27;
 		if (currentItems > i) {
 			CompressChest(i);
 		} else {
@@ -818,8 +832,8 @@ public class Hoverboat extends Entity implements IInventory {
 				}
 				double SpeedLevel = (rand.nextDouble() * 0.6D) + 1.0D;
 				dropPoints[j][1] = Long.valueOf(time + (long) (tntFireRate * SpeedLevel));
-				SelectedDrop.DropItem(worldObj, (EntityLiving) riddenByEntity, point2d.getX() + posX + (float) (rand.nextGaussian() * mod_Hoverboat.Instance.settingFloatDropAccuracy.get()),
-						posY - 1.5D, point2d.getY() + posZ + (float) (rand.nextGaussian() * mod_Hoverboat.Instance.settingFloatDropAccuracy), rotationYaw);
+				SelectedDrop.DropItem(worldObj, (EntityLiving) riddenByEntity, point2d.getX() + posX + (float) (rand.nextGaussian() * mod_Hoverboat.Instance.settingFloatDropAccuracy), posY - 1.5D,
+						point2d.getY() + posZ + (float) (rand.nextGaussian() * mod_Hoverboat.Instance.settingFloatDropAccuracy), rotationYaw);
 			}
 		}
 	}
@@ -922,8 +936,8 @@ public class Hoverboat extends Entity implements IInventory {
 	}
 
 	private void LoadSettings() {
-		CurrentMode = mod_Hoverboat.Instance.settingMultiBoatMode.get();
-		currentItems = mod_Hoverboat.Instance.settingMultiChestSize.get();
+		CurrentMode = mod_Hoverboat.Instance.settingMultiBoatMode;
+		currentItems = mod_Hoverboat.Instance.settingMultiChestSize;
 		KeyboardSteering = mod_Hoverboat.Instance.settingMultiDefKeyboardSteering.get();
 		SelectedArrow = mod_Hoverboat.Instance.GetDefaultProjectile();
 		SelectedDrop = mod_Hoverboat.Instance.GetDefaultDrop();

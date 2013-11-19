@@ -1,7 +1,7 @@
 package Hoverboat;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.world.World;
@@ -16,7 +16,7 @@ public class HoverboatProjectileSpiderJockey extends HoverboatProjectileType {
 	}
 
 	@Override
-	protected Entity CreateItem(World world, EntityLiving entityliving, double d, double d1, double d2) {
+	protected Entity CreateItem(World world, EntityLivingBase entityliving, double d, double d1, double d2) {
 		EntitySpider entityspider = new EntitySpider(world);
 		entityspider.setPosition(d, d1, d2);
 		EntitySkeleton entityskeleton = new EntitySkeleton(world);
@@ -26,7 +26,7 @@ public class HoverboatProjectileSpiderJockey extends HoverboatProjectileType {
 	}
 
 	@Override
-	protected Entity ThrowItem(World world, EntityLiving entityliving, double d, double d1, double d2) {
+	protected Entity ThrowItem(World world, EntityLivingBase entityliving, double d, double d1, double d2) {
 		return CreateItem(world, entityliving, d, d1, d2);
 	}
 }

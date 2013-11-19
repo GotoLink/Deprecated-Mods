@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -38,9 +37,8 @@ import net.minecraft.src.ModLoader;
 import cpw.mods.fml.common.registry.EntityRegistry;
 
 public class mod_Hoverboat {
-	public static Item hoverboatitem = new HoverboatItem(3038).setTextureName("/gui/hoverboat.png").setUnlocalizedName("hoverBoat");
-	public static mod_Hoverboat Instance = null;
-	public static boolean isMCP = false;
+	public static Item hoverboatitem = new HoverboatItem(3038).setTextureName("hoverboat").setUnlocalizedName("hoverBoat");
+	public static mod_Hoverboat Instance;
 	private static Vector<Class<?>> ProjectileBlacklist;
 	private static Vector<HoverboatProjectileType> projectiles = new Vector<HoverboatProjectileType>();
 	private static Vector<Class<?>> ProjectileWhitelist;
@@ -94,8 +92,8 @@ public class mod_Hoverboat {
 	public SettingKey settingKeyShiftModeRight;
 	public SettingKey settingKeySteeringLeft;
 	public SettingKey settingKeySteeringRight;
-	public SettingMulti settingMultiBoatMode;
-	public SettingMulti settingMultiChestSize;
+	public int settingMultiBoatMode;
+	public int settingMultiChestSize;
 	public SettingMulti settingMultiDefKeyboardSteering;
 
 	public void addRenderer(Map map) {
@@ -196,18 +194,12 @@ public class mod_Hoverboat {
 		mod_Hoverboat.ProjectileWhitelist.add(EntityBoat.class);
 		mod_Hoverboat.ProjectileWhitelist.add(EntityFireball.class);
 		mod_Hoverboat.ProjectileWhitelist.add(EntityEgg.class);
-		try {
-			mod_Hoverboat.isMCP = Hoverboat.class.getSuperclass().getName() == "net.minecraft.src.Entity";
-		} catch (Throwable x) {
-			mod_Hoverboat.isMCP = false;
-		}
 		Loaded = false;
 		InitSettings();
 		AddDefaultsButton();
 		mod_Hoverboat.projectiles = new Vector<HoverboatProjectileType>();
 		AllowedProjectiles = new LinkedList<HoverboatProjectileType>();
 		AllowedDrops = new LinkedList<HoverboatProjectileType>();
-		mod_Hoverboat.Instance = this;
 		//ModLoader.addName(mod_Hoverboat.hoverboatitem, "Hoverboat");
 	}
 
@@ -250,7 +242,6 @@ public class mod_Hoverboat {
 		InitArrowSettings();
 		ReloadAllowedProjectiles();
 		ReloadAllowedDrops();
-		settings.load();
 	}
 
 	public void SetDefaultArrow(HoverboatProjectileType hoverboatprojectiletype) {
@@ -292,57 +283,45 @@ public class mod_Hoverboat {
 	}
 
 	private void InitArrowSettings() {
-		WidgetClassicTwocolumn widgetsinglecolumn = new WidgetClassicTwocolumn();
-		widgetsinglecolumn.childDefaultWidth = 170;
-		widgetsinglecolumn.splitDistance = 0;
-		Button button;
 		for (Iterator<?> iterator = mod_Hoverboat.projectiles.iterator(); iterator.hasNext(); widgetsinglecolumn.add(button)) {
 			HoverboatProjectileType hoverboatprojectiletype = (HoverboatProjectileType) iterator.next();
 			hoverboatprojectiletype.settingBoolProjectileEnabled = settings.addSetting(widgetsinglecolumn, (new StringBuilder("Allow ")).append(hoverboatprojectiletype.GetName()).toString(),
 					(new StringBuilder("Hoverboat.Projectile.")).append(hoverboatprojectiletype.GetName()).toString(), true);
-			SimpleButtonModel simplebuttonmodel = new SimpleButtonModel();
 			simplebuttonmodel.addActionCallback(new ModAction(hoverboatprojectiletype, "MakeDefaultArrow", new Class[0]));
-			button = new Button(simplebuttonmodel);
 			button.setText((new StringBuilder("Make ")).append(hoverboatprojectiletype.GetName()).append(" Default").toString());
 		}
 	}
 
 	private void InitDropSettings() {
-		WidgetClassicTwocolumn widgetsinglecolumn = new WidgetClassicTwocolumn();
-		widgetsinglecolumn.childDefaultWidth = 170;
-		widgetsinglecolumn.splitDistance = 0;
-		Button button;
 		for (Iterator<?> iterator = mod_Hoverboat.projectiles.iterator(); iterator.hasNext(); widgetsinglecolumn.add(button)) {
 			HoverboatProjectileType hoverboatprojectiletype = (HoverboatProjectileType) iterator.next();
 			hoverboatprojectiletype.settingBoolDropEnabled = settings.addSetting(widgetsinglecolumn, (new StringBuilder("Allow ")).append(hoverboatprojectiletype.GetName()).toString(),
 					(new StringBuilder("Hoverboat.Drop.")).append(hoverboatprojectiletype.GetName()).toString(), true);
-			SimpleButtonModel simplebuttonmodel = new SimpleButtonModel();
 			simplebuttonmodel.addActionCallback(new ModAction(hoverboatprojectiletype, "MakeDefaultDrop", new Class[0]));
-			button = new Button(simplebuttonmodel);
 			button.setText((new StringBuilder("Make ")).append(hoverboatprojectiletype.GetName()).append(" Default").toString());
 		}
 	}
 
 	private void InitializeProjectiles() {
-		mod_Hoverboat.projectiles = new Vector<HoverboatProjectileType>();
+		projectiles = new Vector<HoverboatProjectileType>();
 		try {
-			HashMap<?, ?> list = (HashMap<?, ?>) ModLoader.getPrivateValue(EntityList.class, null, (mod_Hoverboat.isMCP ? "classToStringMapping" : "b"));
-			mod_Hoverboat.projectiles.add(new HoverboatProjectileArrow(EntityArrow.class, Item.arrow.shiftedIndex, false));
-			mod_Hoverboat.projectiles.add(new HoverboatProjectileArrow(EntityArrow.class, Item.arrow.shiftedIndex, true));
-			mod_Hoverboat.projectiles.add(new HoverboatProjectileDefault(EntityXPOrb.class, -1, "XP Orb Spout"));
-			mod_Hoverboat.projectiles.add(new HoverboatProjectileFireball(EntityFireball.class, -1));
+			Map list = EntityList.classToStringMapping;
+			projectiles.add(new HoverboatProjectileArrow(EntityArrow.class, Item.arrow.itemID, false));
+			projectiles.add(new HoverboatProjectileArrow(EntityArrow.class, Item.arrow.itemID, true));
+			projectiles.add(new HoverboatProjectileDefault(EntityXPOrb.class, -1, "XP Orb Spout"));
+			projectiles.add(new HoverboatProjectileFireball(EntityFireball.class, -1));
 			for (Iterator<?> iterator = list.keySet().iterator(); iterator.hasNext();) {
 				Class<?> class1 = (Class<?>) iterator.next();
-				if (!mod_Hoverboat.ProjectileBlacklist.contains(class1) && !Modifier.isAbstract(class1.getModifiers())) {
+				if (!ProjectileBlacklist.contains(class1) && !Modifier.isAbstract(class1.getModifiers())) {
 					HoverboatProjectileType proj = new HoverboatProjectileDefault(class1, -1, (String) list.get(class1));
 					if ((EntityLiving.class).isAssignableFrom(class1) || (Material.class).isAssignableFrom(class1) || (proj.throwable || mod_Hoverboat.ProjectileWhitelist.contains(class1))) {
-						mod_Hoverboat.projectiles.add(proj);
+						projectiles.add(proj);
 					}
 				}
 			}
-			Collections.sort(mod_Hoverboat.projectiles);
-			mod_Hoverboat.projectiles.add(new HoverboatProjectileTNT(EntityTNTPrimed.class, 46, "TNT Cannon"));
-			mod_Hoverboat.projectiles.add(new HoverboatProjectileSpiderJockey(EntitySpider.class, -1, "Spider Jockey"));
+			Collections.sort(projectiles);
+			projectiles.add(new HoverboatProjectileTNT(EntityTNTPrimed.class, 46, "TNT Cannon"));
+			projectiles.add(new HoverboatProjectileSpiderJockey(EntitySpider.class, -1, "Spider Jockey"));
 			File location = new File((mod_Hoverboat.class).getProtectionDomain().getCodeSource().getLocation().toURI());
 			ClassLoader classloader = (mod_Hoverboat.class).getClassLoader();
 			if (location.isFile() && (location.getName().endsWith(".jar") || location.getName().endsWith(".zip"))) {
@@ -389,76 +368,62 @@ public class mod_Hoverboat {
 	}
 
 	private void InitSettings() {
-		WidgetSinglecolumn widgetsinglecolumn = new WidgetSinglecolumn();
-		settingMultiBoatMode = settings.addSetting(widgetsinglecolumn, "Default Boat Mode", "Hoverboat.DefaultMode", 1, new String[] { "Boat", "Hover", "Flight" });
-		settingMultiChestSize = settings.addSetting(widgetsinglecolumn, "Chest Size", "Hoverboat.ChestSize", 1, new String[] { "Disabled", "Regular", "Double" });
-		settingMultiDefKeyboardSteering = settings.addSetting(widgetsinglecolumn, "Default Steering", "Hoverboat.DefaultSteering", 0, new String[] { "Minecraft Standard", "Free View", "Flight Style",
+		settingMultiBoatMode =  "Default Boat Mode", "Hoverboat.DefaultMode", 1, new String[] { "Boat", "Hover", "Flight" });
+		settingMultiChestSize = "Chest Size", "Hoverboat.ChestSize", 1, new String[] { "Disabled", "Regular", "Double" });
+		settingMultiDefKeyboardSteering = "Default Steering", "Hoverboat.DefaultSteering", 0, new String[] { "Minecraft Standard", "Free View", "Flight Style",
 				"Versatile Mode" });
-		settingFloatMaxSpeed = settings.addSetting(widgetsinglecolumn, "Max Speed", "Hoverboat.MaxSpeed", 1.1F, 0.01F, 0.01F, 3F);
-		settingFloatAcceleration = settings.addSetting(widgetsinglecolumn, "Acceleration", "Hoverboat.Acceleration", 1.4F, 0.01F, 0.01F, 10F);
-		settingFloatMaxAltTurnSpeed = settings.addSetting(widgetsinglecolumn, "Alternate Turn Speed", "Hoverboat.AlternateTurnSpeed", 5F, 0.1F, 0.1F, 10F);
-		settingFloatAltTurnSpeed = settings.addSetting(widgetsinglecolumn, "Alternate Turn Damper", "Hoverboat.AlternateTurnSpeedDamper", 0.25F, 0.01F, 0.01F, 1F);
-		settingFloatMinHover = settings.addSetting(widgetsinglecolumn, "Min Hover Height", "Hoverboat.MinHoverHeight", 1.1F, 0.1F, 0.1F, 3F);
-		settingFloatDefaultHover = settings.addSetting(widgetsinglecolumn, "Default Hover Height", "Hoverboat.DefaultHoverHeight", 2.6F, 0.5F, 0.1F, 4F);
-		settingFloatMaxHover = settings.addSetting(widgetsinglecolumn, "Max Hover Height", "Hoverboat.MaxHoverHeight", 3.7F, 1.0F, 0.1F, 6F);
-		settingFloatMaxJump = settings.addSetting(widgetsinglecolumn, "Max Jump Height", "Hoverboat.MaxJumpHeight", 9F, 1.0F, 0.1F, 14F);
-		settingFloatMinFriction = settings.addSetting(widgetsinglecolumn, "Unmanned Friction", "Hoverboat.MinFriction", 0.8F, 0.0F, 0.01F, 1F);
-		settingFloatMaxFriction = settings.addSetting(widgetsinglecolumn, "Manned Friction", "Hoverboat.MaxFriction", 0.99F, 0.0F, 0.01F, 1F);
-		settingFloatViewShift = settings.addSetting(widgetsinglecolumn, "View (Seat) Shift", "Hoverboat.SeatShift", 0.0F, -1F, 0.01F, 1.0F);
-		settingFloatParticles = settings.addSetting(widgetsinglecolumn, "Particle Multiplier", "Hoverboat.ParticleMultiplier", 1.0F, 0.0F, 0.01F, 1.0F);
-		settingFloatBrakeMult = settings.addSetting(widgetsinglecolumn, "Brake Speed", "Hoverboat.BrakeMult", 0.9F, 0.0F, 0.01F, 1.0F);
-		settingFloatBrakeThreshold = settings.addSetting(widgetsinglecolumn, "Brake Threshold", "Hoverboat.BrakeThreshold", 0.4F, 0.0F, 0.01F, 0.6F);
-		settingBoolSub = settings.addSetting(widgetsinglecolumn, "Submarine Mode", "Hoverboat.SubEnabled", true, "Enabled", "Disabled");
-		settingBoolFireProof = settings.addSetting(widgetsinglecolumn, "Fire Proof", "Hoverboat.FireProof", true, "Yes", "No");
-		settingBoolUseAmmo = settings.addSetting(widgetsinglecolumn, "Use Ammunition", "Hoverboat.UseAmmo", false, "Yes", "No");
-		settingBoolShowHUD = settings.addSetting(widgetsinglecolumn, "On Screen Display", "Hoverboat.ShowHUD", true, "Enabled", "Disabled");
-		settingIntTntTicks = settings.addSetting(widgetsinglecolumn, "TNT Timer", "Hoverboat.TNTTicks", 80, 10, 160);
-		settingBoolAllowFastFov = settings.addSetting(widgetsinglecolumn, "Have FOV Based on speed?", "Hoverboat.FastFOV", false);
-		modscreen.append(GuiApiHelper.makeButton("General Settings", "show", GuiModScreen.class, true, new Class[] { Widget.class }, new WidgetSimplewindow(widgetsinglecolumn, "General Settings")));
-		widgetsinglecolumn = new WidgetSinglecolumn();
-		settingBoolEnableTNT = settings.addSetting(widgetsinglecolumn, "Enable Drops", "Hoverboat.EnableTNT", true, "Enabled", "Disabled");
-		settingIntTNTFireRate = settings.addSetting(widgetsinglecolumn, "Drop Rate", "Hoverboat.DropRate", 150, 1, 5000);
-		settingIntTntLines = settings.addSetting(widgetsinglecolumn, "Drop Lines", "Hoverboat.DropLines", 3, 0, 20);
-		settingFloatDropAccuracy = settings.addSetting(widgetsinglecolumn, "Drop Accuracy", "Hoverboat.DropAccuracy", 0.0F, 0.0F, 0.01F, 1F);
-		widgetsinglecolumn.add(GuiApiHelper.makeButton("View Selection List", "showDropSelectionScreen", this, true));
-		modscreen.append(GuiApiHelper.makeButton("Drop Settings", "show", GuiModScreen.class, true, new Class[] { Widget.class }, new WidgetSimplewindow(widgetsinglecolumn, "Drop Settings")));
-		widgetsinglecolumn = new WidgetSinglecolumn();
-		settingBoolEnableArrows = settings.addSetting(widgetsinglecolumn, "Cannon / Arrow Firing", "Hoverboat.EnableProjectiles", true, "Enabled", "Disabled");
-		settingIntArrowFireRate = settings.addSetting(widgetsinglecolumn, "Fire Rate", "Hoverboat.CannonFireRate", 75, 1, 5000);
-		settingFloatFireballSpeed = settings.addSetting(widgetsinglecolumn, "Fireball Speed Booster", "Hoverboat.FireballBooster", 0.7F, 0.01F, 0.01F, 3F);
-		settingFloatTNTVel = settings.addSetting(widgetsinglecolumn, "Cannon Velocity", "Hoverboat.CannonVelocity", 1.5F, 0.5F, 0.01F, 4F);
-		settingFloatArrowVel = settings.addSetting(widgetsinglecolumn, "Arrow Velocity Multiplier", "Hoverboat.ArrowMult", 1.0F, 0.5F, 0.01F, 4F);
-		settingFloatCannonAccuracy = settings.addSetting(widgetsinglecolumn, "Cannon Accuracy", "Hoverboat.CannonAccuracy", 0.0F, 0.0F, 0.1F, 40F);
-		widgetsinglecolumn.add(GuiApiHelper.makeButton("View Selection List", "showArrowSelectionScreen", this, true));
-		modscreen.append(GuiApiHelper.makeButton("Arrow / Cannon Settings", "show", GuiModScreen.class, true, new Class[] { Widget.class }, new WidgetSimplewindow(widgetsinglecolumn,
-				"Arrow / Cannon Settings")));
-		widgetsinglecolumn = new WidgetSinglecolumn();
-		settingKeyPark = settings.addSetting(widgetsinglecolumn, "Park", "Hoverboat.KeyPark", 54);
-		settingKeyBrake = settings.addSetting(widgetsinglecolumn, "Brake", "Hoverboat.KeyBrake", 46);
-		settingKeyFireArrow = settings.addSetting(widgetsinglecolumn, "Fire Cannon / Arrow", "Hoverboat.KeyFireProjectile", 42);
-		settingKeyFireTnt = settings.addSetting(widgetsinglecolumn, "Drop", "Hoverboat.KeyDrop", 29);
-		settingKeyShiftModeLeft = settings.addSetting(widgetsinglecolumn, "Shift Mode Left", "Hoverboat.KeySML", 24);
-		settingKeyShiftModeRight = settings.addSetting(widgetsinglecolumn, "Shift Mode Right", "Hoverboat.KeySMR", 25);
-		settingKeyShiftArrowLeft = settings.addSetting(widgetsinglecolumn, "Shift Arrow Left", "Hoverboat.KeySAL", 37);
-		settingKeyShiftArrowRight = settings.addSetting(widgetsinglecolumn, "Shift Arrow Right", "Hoverboat.KeySAR", 38);
-		settingKeyShiftDropLeft = settings.addSetting(widgetsinglecolumn, "Shift Drop Left", "Hoverboat.KeySDL", 35);
-		settingKeyShiftDropRight = settings.addSetting(widgetsinglecolumn, "Shift Drop Right", "Hoverboat.KeySDR", 36);
-		settingKeySelectBoat = settings.addSetting(widgetsinglecolumn, "Select Boat", "Hoverboat.KeySelBoat", 47);
-		settingKeySelectHover = settings.addSetting(widgetsinglecolumn, "Select Hover", "Hoverboat.KeySelHover", 48);
-		settingKeySelectFlight = settings.addSetting(widgetsinglecolumn, "Select Flight", "Hoverboat.KeySelFlight", 49);
-		settingKeySteeringLeft = settings.addSetting(widgetsinglecolumn, "Shift Steer Mode Left", "Hoverboat.KeySteerLeft", 51);
-		settingKeySteeringRight = settings.addSetting(widgetsinglecolumn, "Shift Steer Mode Right", "Hoverboat.KeySteerRight", 52);
-		modscreen.append(GuiApiHelper.makeButton("Key Binding Settings", "show", GuiModScreen.class, true, new Class[] { Widget.class }, new WidgetSimplewindow(widgetsinglecolumn,
-				"Key Binding Settings")));
+		settingFloatMaxSpeed = "Max Speed", "Hoverboat.MaxSpeed", 1.1F, 0.01F, 0.01F, 3F);
+		settingFloatAcceleration = "Acceleration", "Hoverboat.Acceleration", 1.4F, 0.01F, 0.01F, 10F);
+		settingFloatMaxAltTurnSpeed = "Alternate Turn Speed", "Hoverboat.AlternateTurnSpeed", 5F, 0.1F, 0.1F, 10F);
+		settingFloatAltTurnSpeed = "Alternate Turn Damper", "Hoverboat.AlternateTurnSpeedDamper", 0.25F, 0.01F, 0.01F, 1F);
+		settingFloatMinHover = "Min Hover Height", "Hoverboat.MinHoverHeight", 1.1F, 0.1F, 0.1F, 3F);
+		settingFloatDefaultHover = "Default Hover Height", "Hoverboat.DefaultHoverHeight", 2.6F, 0.5F, 0.1F, 4F);
+		settingFloatMaxHover = "Max Hover Height", "Hoverboat.MaxHoverHeight", 3.7F, 1.0F, 0.1F, 6F);
+		settingFloatMaxJump = "Max Jump Height", "Hoverboat.MaxJumpHeight", 9F, 1.0F, 0.1F, 14F);
+		settingFloatMinFriction = "Unmanned Friction", "Hoverboat.MinFriction", 0.8F, 0.0F, 0.01F, 1F);
+		settingFloatMaxFriction = "Manned Friction", "Hoverboat.MaxFriction", 0.99F, 0.0F, 0.01F, 1F);
+		settingFloatViewShift = "View (Seat) Shift", "Hoverboat.SeatShift", 0.0F, -1F, 0.01F, 1.0F);
+		settingFloatParticles = "Particle Multiplier", "Hoverboat.ParticleMultiplier", 1.0F, 0.0F, 0.01F, 1.0F);
+		settingFloatBrakeMult =  "Brake Speed", "Hoverboat.BrakeMult", 0.9F, 0.0F, 0.01F, 1.0F);
+		settingFloatBrakeThreshold = "Brake Threshold", "Hoverboat.BrakeThreshold", 0.4F, 0.0F, 0.01F, 0.6F);
+		settingBoolSub = "Submarine Mode", "Hoverboat.SubEnabled", true, "Enabled", "Disabled");
+		settingBoolFireProof = "Fire Proof", "Hoverboat.FireProof", true, "Yes", "No");
+		settingBoolUseAmmo = "Use Ammunition", "Hoverboat.UseAmmo", false, "Yes", "No");
+		settingBoolShowHUD = "On Screen Display", "Hoverboat.ShowHUD", true, "Enabled", "Disabled");
+		settingIntTntTicks = "TNT Timer", "Hoverboat.TNTTicks", 80, 10, 160);
+		settingBoolAllowFastFov = "Have FOV Based on speed?", "Hoverboat.FastFOV", false);
+		settingBoolEnableTNT = "Enable Drops", "Hoverboat.EnableTNT", true, "Enabled", "Disabled");
+		settingIntTNTFireRate = "Drop Rate", "Hoverboat.DropRate", 150, 1, 5000);
+		settingIntTntLines = "Drop Lines", "Hoverboat.DropLines", 3, 0, 20);
+		settingFloatDropAccuracy = "Drop Accuracy", "Hoverboat.DropAccuracy", 0.0F, 0.0F, 0.01F, 1F);
+		settingBoolEnableArrows = "Cannon / Arrow Firing", "Hoverboat.EnableProjectiles", true, "Enabled", "Disabled");
+		settingIntArrowFireRate = "Fire Rate", "Hoverboat.CannonFireRate", 75, 1, 5000);
+		settingFloatFireballSpeed = "Fireball Speed Booster", "Hoverboat.FireballBooster", 0.7F, 0.01F, 0.01F, 3F);
+		settingFloatTNTVel = "Cannon Velocity", "Hoverboat.CannonVelocity", 1.5F, 0.5F, 0.01F, 4F);
+		settingFloatArrowVel = "Arrow Velocity Multiplier", "Hoverboat.ArrowMult", 1.0F, 0.5F, 0.01F, 4F);
+		settingFloatCannonAccuracy = "Cannon Accuracy", "Hoverboat.CannonAccuracy", 0.0F, 0.0F, 0.1F, 40F);
+		settingKeyPark = "Park", "Hoverboat.KeyPark", 54);
+		settingKeyBrake = "Brake", "Hoverboat.KeyBrake", 46);
+		settingKeyFireArrow = "Fire Cannon / Arrow", "Hoverboat.KeyFireProjectile", 42);
+		settingKeyFireTnt = "Drop", "Hoverboat.KeyDrop", 29);
+		settingKeyShiftModeLeft = "Shift Mode Left", "Hoverboat.KeySML", 24);
+		settingKeyShiftModeRight = "Shift Mode Right", "Hoverboat.KeySMR", 25);
+		settingKeyShiftArrowLeft = "Shift Arrow Left", "Hoverboat.KeySAL", 37);
+		settingKeyShiftArrowRight = "Shift Arrow Right", "Hoverboat.KeySAR", 38);
+		settingKeyShiftDropLeft = "Shift Drop Left", "Hoverboat.KeySDL", 35);
+		settingKeyShiftDropRight = "Shift Drop Right", "Hoverboat.KeySDR", 36);
+		settingKeySelectBoat = "Select Boat", "Hoverboat.KeySelBoat", 47);
+		settingKeySelectHover = "Select Hover", "Hoverboat.KeySelHover", 48);
+		settingKeySelectFlight = "Select Flight", "Hoverboat.KeySelFlight", 49);
+		settingKeySteeringLeft = "Shift Steer Mode Left", "Hoverboat.KeySteerLeft", 51);
+		settingKeySteeringRight = "Shift Steer Mode Right", "Hoverboat.KeySteerRight", 52);
 		settingDefaultProjectile = new SettingText("Hoverboat.DefaultProjectile", "NULL");
 		settingDefaultDrop = new SettingText("Hoverboat.DefaultDrop", "NULL");
-		settings.append(settingDefaultProjectile);
-		settings.append(settingDefaultDrop);
 	}
 
 	private void ReloadAllowedDrops() {
 		AllowedDrops.clear();
-		for (Iterator<?> iterator = mod_Hoverboat.projectiles.iterator(); iterator.hasNext();) {
+		for (Iterator<?> iterator = projectiles.iterator(); iterator.hasNext();) {
 			HoverboatProjectileType hoverboatprojectiletype = (HoverboatProjectileType) iterator.next();
 			if (hoverboatprojectiletype.AllowForDrops) {
 				AllowedDrops.add(hoverboatprojectiletype);
@@ -474,7 +439,7 @@ public class mod_Hoverboat {
 			return;
 		}
 		AllowedProjectiles.clear();
-		for (Iterator<?> iterator = mod_Hoverboat.projectiles.iterator(); iterator.hasNext();) {
+		for (Iterator<?> iterator = projectiles.iterator(); iterator.hasNext();) {
 			HoverboatProjectileType hoverboatprojectiletype = (HoverboatProjectileType) iterator.next();
 			if (hoverboatprojectiletype.AllowForShoot) {
 				AllowedProjectiles.add(hoverboatprojectiletype);
@@ -511,7 +476,7 @@ public class mod_Hoverboat {
 							for (int i = 0; i < ahoverboatprojectiletype.length; i++) {
 								System.out.println((new StringBuilder("\tHoverboat Third Party Mod ")).append(hoverboat_thirdparty.toString()).append(" Loaded Projectile ")
 										.append(ahoverboatprojectiletype[i].GetName()).toString());
-								mod_Hoverboat.projectiles.add(ahoverboatprojectiletype[i]);
+								projectiles.add(ahoverboatprojectiletype[i]);
 							}
 						}
 					} catch (Throwable throwable1) {

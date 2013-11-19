@@ -1,7 +1,7 @@
 package Hoverboat;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.world.World;
 
@@ -26,7 +26,7 @@ public class HoverboatProjectileArrow extends HoverboatProjectileType {
 	}
 
 	@Override
-	protected Entity CreateItem(World world, EntityLiving entityliving, double d, double d1, double d2) throws Throwable {
+	protected Entity CreateItem(World world, EntityLivingBase entityliving, double d, double d1, double d2) throws Throwable {
 		EntityArrow arrow = new EntityArrow(world, entityliving, 0F);
 		arrow.setIsCritical(doCrit);
 		arrow.setPosition(d, d1, d2);
@@ -34,7 +34,7 @@ public class HoverboatProjectileArrow extends HoverboatProjectileType {
 	}
 
 	@Override
-	protected Entity ThrowItem(World world, EntityLiving entityliving, double d, double d1, double d2) throws Throwable {
+	protected Entity ThrowItem(World world, EntityLivingBase entityliving, double d, double d1, double d2) throws Throwable {
 		EntityArrow arrow = new EntityArrow(world, entityliving, 1F);
 		arrow.setIsCritical(doCrit);
 		arrow.setPosition(d, d1, d2);

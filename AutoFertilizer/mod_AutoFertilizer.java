@@ -43,79 +43,59 @@ public class mod_AutoFertilizer {
 	private static int settingIntFertBlockTicksPerSecond;
 	private static int settingIntFertBoatTicksPerSecond;
 	private static int settingIntFertilizeRange;
-	private static WidgetSimplewindow subscreenFertBlock;
-	private static WidgetSimplewindow subscreenFertBoat;
-	private static WidgetSimplewindow subscreenFertilization;
 	private static Field wolfshakeflag;
 	private static Field wolfshakingflag;
 	private static Field wolfshakingprevtime;
 	private static Field wolfshakingtime;
 
 	public mod_AutoFertilizer() {
-		WidgetSinglecolumn widgetsinglecolumn = new WidgetSinglecolumn(new Widget[0]);
-		{
-			mod_AutoFertilizer.settingIntChanceWaterField = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Water Fields", "AutoFert.WaterField", 100, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceSeedCrops = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Seed Crops", "AutoFert.SeedCrops", 0, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceGrowCrops = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Grow Crops", "AutoFert.GrowCrops", 25, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceGrowGrass = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Grow Grass", "AutoFert.GrowGrass", 50, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceGrowFlowers = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Grow Flowers", "AutoFert.Flowers", 0, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceGrowTallGrass = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Grow Tall Grass", "AutoFert.TallGrass", 0, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceGrowReed = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Grow Reed", "AutoFert.GrowReed", 50, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceGrowCactus = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Grow Cactus", "AutoFert.GrowCactus", 50, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceHardenLava = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Harden Lava", "AutoFert.HardenLava", 50, 0, 1, 500);
-			mod_AutoFertilizer.settingIntChanceSplashWater = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Chance to Splash Water", "AutoFert.SplashWater", 125, 0, 1, 500);
-			mod_AutoFertilizer.settingIntFertilizeRange = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Fertilizer Range", "AutoFert.FertilizeRange", 3, 1, 1, 10);
-		}
-		mod_AutoFertilizer.subscreenFertilization = new WidgetSimplewindow(widgetsinglecolumn, "Fertilization Options");
-		mod_AutoFertilizer.modscreen
-				.append(GuiApiHelper.makeButton("Fertilization Options", "show", GuiModScreen.class, true, new Class[] { Widget.class }, mod_AutoFertilizer.subscreenFertilization));
-		widgetsinglecolumn = new WidgetSinglecolumn(new Widget[0]);
-		{
-			mod_AutoFertilizer.settingBooleanFertBlockNeedsPower = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Requires Restone Power", "AutoFert.FertBlockNeedsPower", false);
-			mod_AutoFertilizer.settingIntFertBlockTicksPerSecond = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Ticks Per Second", "AutoFert.FertBlockTicksPerSecond", 20, 1, 1, 20);
-		}
-		mod_AutoFertilizer.subscreenFertBlock = new WidgetSimplewindow(widgetsinglecolumn, "Sprinkler Options");
-		mod_AutoFertilizer.modscreen.append(GuiApiHelper.makeButton("Sprinkler Options", "show", GuiModScreen.class, true, new Class[] { Widget.class }, mod_AutoFertilizer.subscreenFertBlock));
-		widgetsinglecolumn = new WidgetSinglecolumn(new Widget[0]);
-		{
-			mod_AutoFertilizer.settingFloatFertBoatSpeedWorking = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Speed in Work Mode", "AutoFert.FertBoatSpeedWorking", 0.15f, 0.05f,
+			settingIntChanceWaterField =  "Chance to Water Fields", "AutoFert.WaterField", 100, 0, 1, 500);
+			settingIntChanceSeedCrops =  "Chance to Seed Crops", "AutoFert.SeedCrops", 0, 0, 1, 500);
+			settingIntChanceGrowCrops =  "Chance to Grow Crops", "AutoFert.GrowCrops", 25, 0, 1, 500);
+			settingIntChanceGrowGrass =  "Chance to Grow Grass", "AutoFert.GrowGrass", 50, 0, 1, 500);
+			settingIntChanceGrowFlowers =  "Chance to Grow Flowers", "AutoFert.Flowers", 0, 0, 1, 500);
+			settingIntChanceGrowTallGrass =  "Chance to Grow Tall Grass", "AutoFert.TallGrass", 0, 0, 1, 500);
+			settingIntChanceGrowReed =  "Chance to Grow Reed", "AutoFert.GrowReed", 50, 0, 1, 500);
+			settingIntChanceGrowCactus =  "Chance to Grow Cactus", "AutoFert.GrowCactus", 50, 0, 1, 500);
+			settingIntChanceHardenLava =  "Chance to Harden Lava", "AutoFert.HardenLava", 50, 0, 1, 500);
+			settingIntChanceSplashWater =  "Chance to Splash Water", "AutoFert.SplashWater", 125, 0, 1, 500);
+			settingIntFertilizeRange =  "Fertilizer Range", "AutoFert.FertilizeRange", 3, 1, 1, 10);
+		
+			settingBooleanFertBlockNeedsPower = "Requires Restone Power", "AutoFert.FertBlockNeedsPower", false);
+			settingIntFertBlockTicksPerSecond = "Ticks Per Second", "AutoFert.FertBlockTicksPerSecond", 20, 1, 1, 20);
+		
+			settingFloatFertBoatSpeedWorking =  "Speed in Work Mode", "AutoFert.FertBoatSpeedWorking", 0.15f, 0.05f,
 					0.05f, 1f);
-			mod_AutoFertilizer.settingFloatFertBoatSpeedBoost = mod_AutoFertilizer.settings
-					.addSetting(widgetsinglecolumn, "Speed in Boost Mode", "AutoFert.FertBoatSpeedBoost", 0.3f, 0.01f, 0.01f, 1f);
-			mod_AutoFertilizer.settingFloatFertBoatHoverHeight = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Hover Height", "AutoFert.FertBoatHoverHeight", 3f, 0.1f, 0.1f, 6f);
-			mod_AutoFertilizer.settingIntFertBoatTicksPerSecond = mod_AutoFertilizer.settings.addSetting(widgetsinglecolumn, "Ticks Per Second", "AutoFert.FertBoatTicksPerSecond", 20, 1, 1, 20);
-		}
-		mod_AutoFertilizer.subscreenFertBoat = new WidgetSimplewindow(widgetsinglecolumn, "Fertilization Boat Options");
-		mod_AutoFertilizer.modscreen
-				.append(GuiApiHelper.makeButton("Fertilization Boat Options", "show", GuiModScreen.class, true, new Class[] { Widget.class }, mod_AutoFertilizer.subscreenFertBoat));
-		mod_AutoFertilizer.modscreen.append(GuiApiHelper.makeButton("Reset all settings", "resetAll", settings, true));
-		mod_AutoFertilizer.settings.load();
-		boolean MCP = EntityWolf.class.getName() == "net.minecraft.src.EntityWolf";
+			settingFloatFertBoatSpeedBoost =  "Speed in Boost Mode", "AutoFert.FertBoatSpeedBoost", 0.3f, 0.01f, 0.01f, 1f);
+			settingFloatFertBoatHoverHeight = "Hover Height", "AutoFert.FertBoatHoverHeight", 3f, 0.1f, 0.1f, 6f);
+			settingIntFertBoatTicksPerSecond = "Ticks Per Second", "AutoFert.FertBoatTicksPerSecond", 20, 1, 1, 20);
+		
+		boolean MCP = EntityWolf.class.getName().equals("net.minecraft.src.EntityWolf");
 		try {
-			mod_AutoFertilizer.wolfshakeflag = EntityWolf.class.getDeclaredField(MCP ? "isWolfShaking" : "d");
-			mod_AutoFertilizer.wolfshakingflag = EntityWolf.class.getDeclaredField(MCP ? "field_25052_g" : "e");
-			mod_AutoFertilizer.wolfshakingprevtime = EntityWolf.class.getDeclaredField(MCP ? "prevTimeWolfIsShaking" : "aq");
-			mod_AutoFertilizer.wolfshakingtime = EntityWolf.class.getDeclaredField(MCP ? "timeWolfIsShaking" : "ap");
-			mod_AutoFertilizer.wolfshakeflag.setAccessible(true);
-			mod_AutoFertilizer.wolfshakingflag.setAccessible(true);
-			mod_AutoFertilizer.wolfshakingprevtime.setAccessible(true);
-			mod_AutoFertilizer.wolfshakingtime.setAccessible(true);
+			wolfshakeflag = EntityWolf.class.getDeclaredField(MCP ? "isWolfShaking" : "d");
+			wolfshakingflag = EntityWolf.class.getDeclaredField(MCP ? "field_25052_g" : "e");
+			wolfshakingprevtime = EntityWolf.class.getDeclaredField(MCP ? "prevTimeWolfIsShaking" : "aq");
+			wolfshakingtime = EntityWolf.class.getDeclaredField(MCP ? "timeWolfIsShaking" : "ap");
+			wolfshakeflag.setAccessible(true);
+			wolfshakingflag.setAccessible(true);
+			wolfshakingprevtime.setAccessible(true);
+			wolfshakingtime.setAccessible(true);
 		} catch (Throwable e) {
-			mod_AutoFertilizer.wolfshakeflag = null;
-			mod_AutoFertilizer.wolfshakingflag = null;
-			mod_AutoFertilizer.wolfshakingprevtime = null;
-			mod_AutoFertilizer.wolfshakingtime = null;
+			wolfshakeflag = null;
+			wolfshakingflag = null;
+			wolfshakingprevtime = null;
+			wolfshakingtime = null;
 			ModLoader.getLogger().log(Level.FINE, "AutoFertilizer is disabling the wolf shaking feature due to an exception for the reflection initialization.", e);
 		}
-		mod_AutoFertilizer.afertblock = new AutoFertilizerBlock(97))
+		mod_AutoFertilizer.afertblock = new AutoFertilizerBlock(97)
 				.setHardness(0.0F).setStepSound(Block.soundMetalFootstep).setUnlocalizedName("autofertsprinkler").setTextureName("autofertsprinkler");
 		GameRegistry.registerBlock(mod_AutoFertilizer.afertblock);
 		mod_AutoFertilizer.afertitem = new AutoFertItem(3039);
 		//ModLoader.AddName(mod_AutoFertilizer.afertblock, "Sprinkler");
 		//ModLoader.AddName(new ItemStack(mod_AutoFertilizer.afertitem, 1, 0), "Auto Fertilizer Boat");
 		//ModLoader.AddName(new ItemStack(mod_AutoFertilizer.afertitem, 1, 1), "Auto Fertilizer Cart");
-		ModLoader.registerModEntity(AutoFertBoatEntity.class, "AutoFertBoat", 0, this);
-		ModLoader.registerModEntity(AutoFertCartEntity.class, "AutoFertCart", 1, this);
+		EntityRegistry.registerModEntity(AutoFertBoatEntity.class, "AutoFertBoat", 0, this);
+		EntityRegistry.registerModEntity(AutoFertCartEntity.class, "AutoFertCart", 1, this);
 		mod_AutoFertilizer.SetRadius(3);
 		CraftingManager.getInstance().addRecipe(new ItemStack(mod_AutoFertilizer.afertitem, 1, 0),
 				new Object[] { "B", "S", Character.valueOf('S'), new ItemStack(mod_AutoFertilizer.afertblock, 1), Character.valueOf('B'), Item.boat });

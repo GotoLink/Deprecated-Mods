@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityEgg;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.src.ModLoader;
@@ -42,7 +42,7 @@ public abstract class HoverboatProjectileType implements Comparable<HoverboatPro
 		return toString().compareTo(other.toString());
 	}
 
-	public Entity DropItem(World world, EntityLiving entityliving, double d, double d1, double d2, float f) {
+	public Entity DropItem(World world, EntityLivingBase entityliving, double d, double d1, double d2, float f) {
 		try {
 			Entity entity = CreateItem(world, entityliving, d, d1, d2);
 			if (entity == null) {
@@ -75,7 +75,7 @@ public abstract class HoverboatProjectileType implements Comparable<HoverboatPro
 		}
 	}
 
-	public Entity FireItem(World world, EntityLiving entityliving, double d, double d1, double d2, float f, float f1) {
+	public Entity FireItem(World world, EntityLivingBase entityliving, double d, double d1, double d2, float f, float f1) {
 		try {
 			Entity entity = throwable ? ThrowItem(world, entityliving, d, d1, d2) : CreateItem(world, entityliving, d, d1, d2);
 			if (!overridesPosAngs) {
@@ -162,7 +162,7 @@ public abstract class HoverboatProjectileType implements Comparable<HoverboatPro
 		}
 	}
 
-	protected abstract Entity CreateItem(World world, EntityLiving entityliving, double d, double d1, double d2) throws Throwable;
+	protected abstract Entity CreateItem(World world, EntityLivingBase entityliving, double d, double d1, double d2) throws Throwable;
 
-	protected abstract Entity ThrowItem(World world, EntityLiving entityliving, double d, double d1, double d2) throws Throwable;
+	protected abstract Entity ThrowItem(World world, EntityLivingBase entityliving, double d, double d1, double d2) throws Throwable;
 }

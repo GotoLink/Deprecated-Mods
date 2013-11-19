@@ -64,7 +64,7 @@ public class AutoFertCartRender extends Render {
 		GL11.glScalef(f5, f5, f5);
 		GL11.glTranslatef(0.0F, 0.3125F, 0.0F);
 		GL11.glRotatef(90F, 0.0F, 1.0F, 0.0F);
-		(new RenderBlocks()).renderBlockOnInventory(mod_AutoFertilizer.afertblock, 0, 1);
+		new RenderBlocks().renderBlockAsItem(mod_AutoFertilizer.afertblock, 0, 1);
 		GL11.glRotatef(-90F, 0.0F, 1.0F, 0.0F);
 		GL11.glTranslatef(0.0F, -0.3125F, 0.0F);
 		GL11.glScalef(1.0F / f5, 1.0F / f5, 1.0F / f5);
